@@ -1,1 +1,78 @@
-# Your Solution
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: books
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: books
+  template:
+    metadata:
+      labels:
+        app: books
+    spec:
+      containers:
+      - name: books
+        image: nirajsit722part3.azurecr.io/books:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: DATABASE_URL
+          value: "postgresql://sit722_part3_y7ef_user:5GjPkPM8ITo0gGbdDlVV4bQVmkyuqqPp@dpg-crejvp3gbbvc73brfdjg-a.oregon-postgres.render.com/sit722_part3_y7ef"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: books-service
+spec:
+  selector:
+    app: books
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+      - name: inventory
+        image: nirajsit722part3.azurecr.io/inventory:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8090
+        env:
+        - name: PORT
+          value: "8090"
+        - name: DATABASE_URL
+          value: "postgresql+psycopg2://sit722user:Pa$$w0rd!@part3db.postgres.database.azure.com:5432/postgres"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  selector:
+    app: inventory
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8090
+      targetPort: 8090
